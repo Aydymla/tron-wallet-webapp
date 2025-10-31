@@ -1,6 +1,0 @@
-aiogram==3.4.1
-aiohttp
-aiosqlite
-tronpy
-bip_utils
-python-dotenv
