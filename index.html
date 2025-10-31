@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRON Wallet</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  body { font-family: system-ui, sans-serif; background: #0d1117; color: #fff; margin: 0; padding: 20px; }
+  .card { background: #161b22; padding: 20px; border-radius: 12px; }
+  button { background: #0088cc; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+</style>
+</head>
+<body>
+  <h2>💼 Ваш TRON кошелёк</h2>
+  <div class="card" id="wallet">Загрузка...</div>
+  <br>
+  <button id="refresh">🔄 Обновить</button>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+const API_URL = "https://your-backend.onrender.com/api";
+
+const user = tg.initDataUnsafe?.user;
+if (!user) {
+  document.getElementById("wallet").innerText = "Ошибка: пользователь не найден.";
+} else {
+  loadWallet(user.id);
+}
+
+function loadWallet(userId) {
+  fetch(`${API_URL}/wallet/${userId}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) {
+        document.getElementById("wallet").innerHTML = "Кошелёк не найден.";
+      } else {
+        document.getElementById("wallet").innerHTML = `
+          <b>Адрес:</b> ${data.address}<br>
+          💰 TRX: ${data.trx_balance}<br>
+          💵 USDT: ${data.usdt_balance}<br>
+          ⚡ Energy: ${data.energy}<br>
+          <a href="https://tronscan.org/#/address/${data.address}" target="_blank" style="color:#00bfff">Tronscan</a>
+        `;
+      }
+    });
+}
+
+document.getElementById("refresh").addEventListener("click", () => {
+  loadWallet(user.id);
+});
+</script>
+</body>
+</html>
