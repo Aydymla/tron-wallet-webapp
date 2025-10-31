@@ -8,7 +8,7 @@
 <style>
   body { font-family: system-ui, sans-serif; background: #0d1117; color: #fff; margin: 0; padding: 20px; }
   .card { background: #161b22; padding: 20px; border-radius: 12px; }
-  button { background: #0088cc; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+  button { background: #0088cc; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; margin-right: 10px; }
 </style>
 </head>
 <body>
@@ -22,22 +22,37 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// Получаем информацию о пользователе
 const user = tg.initDataUnsafe?.user;
+const walletDiv = document.getElementById("wallet");
+
 if (!user) {
-  document.getElementById("wallet").innerText = "Ошибка: пользователь не найден.";
+  walletDiv.innerText = "Ошибка: пользователь не найден.";
 } else {
-  document.getElementById("wallet").innerHTML = `
+  walletDiv.innerHTML = `
     👤 Пользователь: <b>${user.first_name}</b><br>
     🆔 ID: <code>${user.id}</code><br>
     ✅ WebApp подключен!
   `;
 }
 
-// При нажатии отправляем данные обратно боту
+// Кнопка "Обновить"
+document.getElementById("refresh").addEventListener("click", () => {
+  tg.HapticFeedback.impactOccurred("medium"); // лёгкая вибрация
+  tg.showAlert("🔄 Обновление данных... (обновление пока тестовое)");
+});
+
+// Кнопка "Отправить данные боту"
 document.getElementById("send").addEventListener("click", () => {
-  const payload = { action: "get_balance", user_id: user.id };
-  tg.sendData(JSON.stringify(payload)); // Отправляем в aiogram
+  tg.HapticFeedback.notificationOccurred("success");
+  tg.sendData(JSON.stringify({
+    action: "get_balance",
+    user_id: user.id
+  }));
+  tg.showPopup({
+    title: "Отправлено ✅",
+    message: "Данные отправлены боту.\nПроверь Telegram.",
+    buttons: [{id: "ok", type: "close", text: "ОК"}]
+  });
 });
 </script>
 </body>
